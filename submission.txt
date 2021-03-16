@@ -1,0 +1,247 @@
+1)
+
+
+class Solution {
+    public boolean isSubtree(TreeNode s, TreeNode t) {
+        
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        
+        if(s == null || t == null) return false;
+        
+        stack.add(s);
+        
+        while(!stack.isEmpty()){
+            
+            TreeNode current = stack.pop();
+            
+            if(isSimilar(current, t)) return true;
+            
+            if(current.left != null) stack.add(current.left);
+            if(current.right != null) stack.add(current.right);
+            
+        }
+        
+        
+        return false;
+        
+    }
+    
+    
+    public boolean isSimilar(TreeNode s, TreeNode t){
+        
+        if(s == null && t == null) return true;
+        
+        if((s == null && t != null) || (s != null && t == null) || (s.val != t.val)){
+            return false;
+        }
+        
+        return isSimilar(s.left, t.left) && isSimilar(s.right, t.right);
+        
+    }
+    
+}
+
+
+
+2)
+
+
+
+class Solution {
+    public int[] asteroidCollision(int[] asteroids) {
+        
+        Stack<Integer> stack = new Stack<Integer>();
+        
+        for(int i : asteroids){
+         
+            boolean crushed = false;
+            
+            if(i < 0){
+                while(!stack.isEmpty() && stack.peek() > 0 && stack.peek() < Math.abs(i)) {
+                    stack.pop();
+                }
+                
+                if(!stack.isEmpty() && stack.peek() == Math.abs(i)){
+                    stack.pop();
+                    crushed = true;
+                }
+                
+                if(!stack.isEmpty() && stack.peek() > Math.abs(i)) crushed = true;
+
+            }
+            
+            if(!crushed) stack.add(i);
+            
+        }
+        
+        int[] ret = new int[stack.size()];
+        
+        for(int i = ret.length - 1 ; i >= 0 ; i --){
+            ret[i] = stack.pop();
+        }
+        
+        return ret;
+    }
+}
+
+
+
+
+3)
+
+
+
+
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+    
+        List<List<Integer>> ret = new ArrayList<List<Integer>>();
+
+        if(nums == null || nums.length < 3) return ret;
+        
+        Arrays.sort(nums);
+        
+        for(int i = 0 ; i < nums.length - 2 ; i ++){
+            
+            if(i > 0 && nums[i-1] == nums[i]) continue;
+            
+            int twoSum = 0 - nums[i];
+            
+            int j = i + 1, k = nums.length - 1;
+            
+            while(j < k){
+                int mid = nums[j];
+                int right = nums[k];
+                
+                if(mid + right == twoSum){
+                    
+                    ret.add(Arrays.asList(nums[i], nums[j], nums[k]));
+                    
+                    while(j < k && mid == nums[j]) j++;
+                    while(j < k && right == nums[k]) k--;
+                    
+                } else if(mid + right > twoSum){
+                    
+                    while(j < k && right == nums[k]) k--;
+                } else if(mid + right < twoSum){
+                    
+                    while(j < k && mid == nums[j]) j++;
+                }
+            }
+        }
+        return ret;
+    }
+}
+
+
+4)
+
+
+class Solution {
+    public List<String> generateParenthesis(int n) {
+     
+        ArrayList<String> ret = new ArrayList<String>();
+        
+        generate(new StringBuilder(), n, 0, 0, ret);
+        
+        return ret;
+    }
+    
+    public void generate(StringBuilder sb, int n, int open, int closed, ArrayList<String> ret){
+        
+        if(open + closed == 2*n){
+            ret.add(sb.toString());
+            return;
+        }
+        
+        if(open > closed){
+            sb.append(")");
+            generate(sb, n, open, closed+1, ret);
+            sb.setLength(sb.length() - 1);
+            
+            if(open < n){
+                sb.append("(");
+                generate(sb, n, open+1, closed, ret);
+                sb.setLength(sb.length() - 1);
+            }
+        }
+        
+        if(open == closed && open + closed < 2*n){
+            sb.append("(");
+            generate(sb, n, open+1, closed, ret);
+            sb.setLength(sb.length() - 1);
+        }
+        
+    }
+    
+    
+}
+
+
+
+5)
+
+
+
+
+class Solution {
+    
+    // L -> l -> r -> R -> null
+
+    // L -> r -> l -> R -> null
+    
+    public ListNode reverseKGroup(ListNode head, int k) {
+        
+        if(head == null || head.next == null || k == 1) return head;
+                
+        ListNode dummyHead = new ListNode(-1);
+        dummyHead.next = head;
+        
+        ListNode L = dummyHead, R = null;
+                
+        while(L != null){
+            
+            ListNode current = L.next, l = current, r  = null;
+            int count = 0;
+            
+            while(count < k - 1 && current != null){
+                
+                current = current.next;
+                count++;
+            }
+            
+            if(current == null) break;
+            
+            r = current;
+            R = r.next;
+            r.next = null;
+            L.next = null;
+            
+            ListNode end = reverse(l);
+            L.next = end;
+            l.next = R;
+            
+            L = l;
+            
+        }
+                
+        return dummyHead.next;
+    }
+    
+    public ListNode reverse(ListNode start){
+        
+        ListNode left = null;
+        ListNode mid = start, right = mid.next;
+        
+        while(mid != null){
+            
+            mid.next = left;
+            left = mid;
+            mid = right;
+            if(right != null) right = right.next;
+            
+        }
+        
+        return left;
+    }
+}
